@@ -10,4 +10,8 @@ object Day1 : Puzzle<List<Int>>(1) {
     override fun solvePart1(input: List<Int>): Int {
         return input.zipWithNext().count { (a, b) -> b > a }
     }
+
+    override fun solvePart2(input: List<Int>): Int {
+        return solvePart1(input.windowed(3).map(List<Int>::sum))
+    }
 }
