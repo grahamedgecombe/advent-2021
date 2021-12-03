@@ -1,6 +1,7 @@
 package com.grahamedgecombe.advent2021.day3
 
 import com.grahamedgecombe.advent2021.Puzzle
+import com.grahamedgecombe.advent2021.UnsolvableException
 
 object Day3 : Puzzle<List<String>>(3) {
     override fun parse(input: Sequence<String>): List<String> {
@@ -34,5 +35,31 @@ object Day3 : Puzzle<List<String>>(3) {
         }
 
         return gamma * epsilon
+    }
+
+    override fun solvePart2(input: List<String>): Int {
+        require(input.isNotEmpty())
+
+        val bits = input.first().length
+
+        val oxygenCandidates = input.toMutableList()
+        val co2Candidates = input.toMutableList()
+
+        for (n in 0 until bits) {
+            val mostCommon = getMostCommonValue(oxygenCandidates, n).digitToChar()
+            if (oxygenCandidates.size > 1) {
+                oxygenCandidates.removeIf { number -> number[n] != mostCommon }
+            }
+
+            val leastCommon = invert(getMostCommonValue(co2Candidates, n)).digitToChar()
+            if (co2Candidates.size > 1) {
+                co2Candidates.removeIf { number -> number[n] != leastCommon }
+            }
+        }
+
+        val oxygen = oxygenCandidates.singleOrNull() ?: throw UnsolvableException()
+        val co2 = co2Candidates.singleOrNull() ?: throw UnsolvableException()
+
+        return oxygen.toInt(2) * co2.toInt(2)
     }
 }
