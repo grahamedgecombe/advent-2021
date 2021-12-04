@@ -146,4 +146,24 @@ object Day4 : Puzzle<Day4.Input>(4) {
 
         throw UnsolvableException()
     }
+
+    override fun solvePart2(input: Input): Int {
+        val boards = input.boards.map(::MarkedBoard).toMutableList()
+        var score: Int? = null
+
+        for (number in input.numbers) {
+            boards.removeIf { board ->
+                board.mark(number)
+
+                val winner = board.isWinner()
+                if (winner) {
+                    score = number * board.sumUnmarked()
+                }
+
+                winner
+            }
+        }
+
+        return score ?: throw UnsolvableException()
+    }
 }

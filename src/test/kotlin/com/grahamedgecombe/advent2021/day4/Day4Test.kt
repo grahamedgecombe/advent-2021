@@ -32,4 +32,10 @@ object Day4Test {
         assertEquals(4512, Day4.solvePart1(TEST_INPUT))
         assertEquals(72770, Day4.solvePart1(PROD_INPUT))
     }
+
+    @Test
+    fun testPart2() {
+        assertEquals(1924, Day4.solvePart2(TEST_INPUT))
+        assertEquals(13912, Day4.solvePart2(PROD_INPUT))
+    }
 }
