@@ -10,32 +10,14 @@ object Day6 : Puzzle<List<Int>>(6) {
             .toList()
     }
 
-    override fun solvePart1(input: List<Int>): Int {
-        val fish = input.toMutableList()
-
-        for (day in 0 until 80) {
-            for (i in 0 until fish.size) {
-                val timer = fish[i]
-                if (timer == 0) {
-                    fish[i] = 6
-                    fish += 8
-                } else {
-                    fish[i] = timer - 1
-                }
-            }
-        }
-
-        return fish.size
-    }
-
-    override fun solvePart2(input: List<Int>): Long {
+    private fun solve(input: List<Int>, days: Int): Long {
         val fishByTimer = LongArray(9)
 
         for (timer in input) {
             fishByTimer[timer]++
         }
 
-        for (day in 0 until 256) {
+        for (day in 0 until days) {
             val newFish = fishByTimer[0]
 
             for (timer in 0..7) {
@@ -47,5 +29,13 @@ object Day6 : Puzzle<List<Int>>(6) {
         }
 
         return fishByTimer.sum()
+    }
+
+    override fun solvePart1(input: List<Int>): Long {
+        return solve(input, 80)
+    }
+
+    override fun solvePart2(input: List<Int>): Long {
+        return solve(input, 256)
     }
 }
