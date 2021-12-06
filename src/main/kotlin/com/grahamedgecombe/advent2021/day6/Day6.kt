@@ -27,4 +27,25 @@ object Day6 : Puzzle<List<Int>>(6) {
 
         return fish.size
     }
+
+    override fun solvePart2(input: List<Int>): Long {
+        val fishByTimer = LongArray(9)
+
+        for (timer in input) {
+            fishByTimer[timer]++
+        }
+
+        for (day in 0 until 256) {
+            val newFish = fishByTimer[0]
+
+            for (timer in 0..7) {
+                fishByTimer[timer] = fishByTimer[timer + 1]
+            }
+
+            fishByTimer[6] += newFish
+            fishByTimer[8] = newFish
+        }
+
+        return fishByTimer.sum()
+    }
 }
