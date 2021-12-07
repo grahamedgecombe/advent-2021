@@ -6,6 +6,7 @@ import com.grahamedgecombe.advent2021.day3.Day3
 import com.grahamedgecombe.advent2021.day4.Day4
 import com.grahamedgecombe.advent2021.day5.Day5
 import com.grahamedgecombe.advent2021.day6.Day6
+import com.grahamedgecombe.advent2021.day7.Day7
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
@@ -18,6 +19,7 @@ fun main() {
         Day4,
         Day5,
         Day6,
+        Day7,
     )
 
     for (puzzle in puzzles) {
