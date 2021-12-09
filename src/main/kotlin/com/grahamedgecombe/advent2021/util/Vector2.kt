@@ -1,6 +1,6 @@
 package com.grahamedgecombe.advent2021.util
 
-class Vector2(val x: Int, val y: Int) {
+data class Vector2(val x: Int, val y: Int) {
     fun add(dx: Int, dy: Int): Vector2 {
         return Vector2(x + dx, y + dy)
     }
