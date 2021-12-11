@@ -5,8 +5,8 @@ import com.grahamedgecombe.advent2021.util.Vector2
 
 object Day11 : Puzzle<Day11.Grid>(11) {
     class Grid(
-        private val width: Int,
-        private val height: Int,
+        val width: Int,
+        val height: Int,
         private val energy: IntArray
     ) {
         fun copy(): Grid {
@@ -117,5 +117,15 @@ object Day11 : Puzzle<Day11.Grid>(11) {
             flashes += grid.step()
         }
         return flashes
+    }
+
+    override fun solvePart2(input: Grid): Int {
+        val grid = input.copy()
+
+        var steps = 0
+        do {
+            steps++
+        } while (grid.step() != (grid.width * grid.height))
+        return steps
     }
 }
