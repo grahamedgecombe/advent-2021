@@ -4,11 +4,25 @@ import com.grahamedgecombe.advent2021.Puzzle
 
 object Day12 : Puzzle<Day12.Graph>(12) {
     class Graph(private val edges: Map<String, Set<String>>) {
+        private data class Key(val visited: Set<String>, val current: String, val allowDuplicate: Boolean)
+
         fun countPaths(allowDuplicate: Boolean): Int {
-            return countPaths(mutableSetOf(), "start", allowDuplicate)
+            return countPaths(mutableMapOf(), emptySet(), "start", allowDuplicate)
         }
 
-        private fun countPaths(visited: MutableSet<String>, current: String, allowDuplicate: Boolean): Int {
+        private fun countPaths(
+            cache: MutableMap<Key, Int>,
+            visited: Set<String>,
+            current: String,
+            allowDuplicate: Boolean
+        ): Int {
+            val key = Key(visited, current, allowDuplicate)
+
+            val cachedPaths = cache[key]
+            if (cachedPaths != null) {
+                return cachedPaths
+            }
+
             var nextAllowDuplicate = allowDuplicate
 
             if (current == "start") {
@@ -31,16 +45,12 @@ object Day12 : Puzzle<Day12.Graph>(12) {
              * Remember if we've added current to the visited set at this stack
              * frame, so we don't remove the duplicate too early.
              */
-            val added = visited.add(current)
-
             val neighbours = edges.getOrDefault(current, emptySet())
             for (neighbour in neighbours) {
-                paths += countPaths(visited, neighbour, nextAllowDuplicate)
+                paths += countPaths(cache, visited.plus(current), neighbour, nextAllowDuplicate)
             }
 
-            if (added) {
-                visited.remove(current)
-            }
+            cache[key] = paths
 
             return paths
         }
