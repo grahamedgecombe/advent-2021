@@ -4,37 +4,42 @@ import com.grahamedgecombe.advent2021.Puzzle
 
 object Day12 : Puzzle<Day12.Graph>(12) {
     class Graph(private val edges: Map<String, Set<String>>) {
-        fun findPaths(allowDuplicate: Boolean): Set<List<String>> {
-            return findPaths(emptyList(), "start", allowDuplicate)
+        fun countPaths(allowDuplicate: Boolean): Int {
+            return countPaths(mutableSetOf(), "start", allowDuplicate)
         }
 
-        private fun findPaths(path: List<String>, current: String, allowDuplicate: Boolean): Set<List<String>> {
+        private fun countPaths(visited: MutableSet<String>, current: String, allowDuplicate: Boolean): Int {
             var nextAllowDuplicate = allowDuplicate
 
             if (current == "start") {
-                if (path.isNotEmpty()) {
-                    return emptySet()
+                if (visited.isNotEmpty()) {
+                    return 0
                 }
             } else if (current == "end") {
-                return setOf(path)
-            } else if (isSmall(current)) {
-                val count = path.count { it == current }
-                if (count >= 2) {
-                    return emptySet()
-                } else if (count == 1) {
-                    if (allowDuplicate) {
-                        nextAllowDuplicate = false
-                    } else {
-                        return emptySet()
-                    }
+                return 1
+            } else if (isSmall(current) && visited.contains(current)) {
+                if (allowDuplicate) {
+                    nextAllowDuplicate = false
+                } else {
+                    return 0
                 }
             }
 
-            val paths = mutableSetOf<List<String>>()
+            var paths = 0
+
+            /*
+             * Remember if we've added current to the visited set at this stack
+             * frame, so we don't remove the duplicate too early.
+             */
+            val added = visited.add(current)
 
             val neighbours = edges.getOrDefault(current, emptySet())
             for (neighbour in neighbours) {
-                paths += findPaths(path + current, neighbour, nextAllowDuplicate)
+                paths += countPaths(visited, neighbour, nextAllowDuplicate)
+            }
+
+            if (added) {
+                visited.remove(current)
             }
 
             return paths
@@ -64,10 +69,10 @@ object Day12 : Puzzle<Day12.Graph>(12) {
     }
 
     override fun solvePart1(input: Graph): Int {
-        return input.findPaths(allowDuplicate = false).size
+        return input.countPaths(allowDuplicate = false)
     }
 
     override fun solvePart2(input: Graph): Int {
-        return input.findPaths(allowDuplicate = true).size
+        return input.countPaths(allowDuplicate = true)
     }
 }
