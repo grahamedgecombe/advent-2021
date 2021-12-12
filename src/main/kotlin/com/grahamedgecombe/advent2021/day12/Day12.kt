@@ -4,22 +4,37 @@ import com.grahamedgecombe.advent2021.Puzzle
 
 object Day12 : Puzzle<Day12.Graph>(12) {
     class Graph(private val edges: Map<String, Set<String>>) {
-        fun findPaths(): Set<List<String>> {
-            return findPaths(emptyList(), "start")
+        fun findPaths(allowDuplicate: Boolean): Set<List<String>> {
+            return findPaths(emptyList(), "start", allowDuplicate)
         }
 
-        private fun findPaths(path: List<String>, current: String): Set<List<String>> {
-            if (isSmall(current) && path.contains(current)) {
-                return emptySet()
+        private fun findPaths(path: List<String>, current: String, allowDuplicate: Boolean): Set<List<String>> {
+            var nextAllowDuplicate = allowDuplicate
+
+            if (current == "start") {
+                if (path.isNotEmpty()) {
+                    return emptySet()
+                }
             } else if (current == "end") {
                 return setOf(path)
+            } else if (isSmall(current)) {
+                val count = path.count { it == current }
+                if (count >= 2) {
+                    return emptySet()
+                } else if (count == 1) {
+                    if (allowDuplicate) {
+                        nextAllowDuplicate = false
+                    } else {
+                        return emptySet()
+                    }
+                }
             }
 
             val paths = mutableSetOf<List<String>>()
 
             val neighbours = edges.getOrDefault(current, emptySet())
             for (neighbour in neighbours) {
-                paths += findPaths(path + current, neighbour)
+                paths += findPaths(path + current, neighbour, nextAllowDuplicate)
             }
 
             return paths
@@ -49,6 +64,10 @@ object Day12 : Puzzle<Day12.Graph>(12) {
     }
 
     override fun solvePart1(input: Graph): Int {
-        return input.findPaths().size
+        return input.findPaths(allowDuplicate = false).size
+    }
+
+    override fun solvePart2(input: Graph): Int {
+        return input.findPaths(allowDuplicate = true).size
     }
 }
