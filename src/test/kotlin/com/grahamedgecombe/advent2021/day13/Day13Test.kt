@@ -34,4 +34,16 @@ object Day13Test {
         assertEquals(17, Day13.solvePart1(TEST_INPUT))
         assertEquals(850, Day13.solvePart1(PROD_INPUT))
     }
+
+    @Test
+    fun testPart2() {
+        assertEquals("""
+            .##..#..#..##...##..###...##...##..#..#
+            #..#.#..#.#..#.#..#.#..#.#..#.#..#.#..#
+            #..#.####.#....#....#..#.#....#..#.#..#
+            ####.#..#.#.##.#....###..#.##.####.#..#
+            #..#.#..#.#..#.#..#.#....#..#.#..#.#..#
+            #..#.#..#..###..##..#.....###.#..#..##.
+        """.trimIndent(), Day13.solvePart2(PROD_INPUT))
+    }
 }

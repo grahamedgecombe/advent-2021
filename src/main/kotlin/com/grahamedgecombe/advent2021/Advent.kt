@@ -13,6 +13,7 @@ import com.grahamedgecombe.advent2021.day6.Day6
 import com.grahamedgecombe.advent2021.day7.Day7
 import com.grahamedgecombe.advent2021.day8.Day8
 import com.grahamedgecombe.advent2021.day9.Day9
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
@@ -46,12 +47,22 @@ private fun <T> solve(puzzle: Puzzle<T>) {
     val solutionPart1 = measureTimedValue {
         puzzle.solvePart1(input)
     }
-    println("Day ${puzzle.number} Part 1: ${solutionPart1.value} (${solutionPart1.duration})")
+    printSolution(puzzle.number, 1, solutionPart1.value, solutionPart1.duration)
 
     val solutionPart2 = measureTimedValue {
         puzzle.solvePart2(input)
     }
     if (solutionPart2.value != null) {
-        println("Day ${puzzle.number} Part 2: ${solutionPart2.value} (${solutionPart2.duration})")
+        printSolution(puzzle.number, 2, solutionPart2.value!!, solutionPart2.duration)
+    }
+}
+
+private fun printSolution(day: Int, part: Int, solution: Any, duration: Duration) {
+    val value = solution.toString()
+    if (value.contains('\n')) {
+        println("Day $day Part $part: ($duration)")
+        println(value.trim())
+    } else {
+        println("Day $day Part $part: $value ($duration)")
     }
 }

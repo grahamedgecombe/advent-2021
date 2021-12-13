@@ -66,7 +66,38 @@ object Day13 : Puzzle<Day13.Input>(13) {
         }
     }
 
+    private fun plot(dots: Set<Vector2>): String {
+        val builder = StringBuilder()
+
+        val width = dots.maxOf(Vector2::x) + 1
+        val height = dots.maxOf(Vector2::y) + 1
+
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                if (dots.contains(Vector2(x, y))) {
+                    builder.append('#')
+                } else {
+                    builder.append('.')
+                }
+            }
+
+            if (y != height - 1) {
+                builder.append('\n')
+            }
+        }
+
+        return builder.toString()
+    }
+
     override fun solvePart1(input: Input): Int {
         return fold(input.dots, input.folds.first()).size
+    }
+
+    override fun solvePart2(input: Input): String {
+        var dots = input.dots
+        for (fold in input.folds) {
+            dots = fold(dots, fold)
+        }
+        return plot(dots)
     }
 }
