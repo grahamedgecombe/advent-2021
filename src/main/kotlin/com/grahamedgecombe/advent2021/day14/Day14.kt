@@ -11,6 +11,8 @@ object Day14 : Puzzle<Day14.Input>(14) {
         val rules: Map<Pair<Char, Char>, Char>
     ) {
         fun solve(steps: Int): Long {
+            require(template.isNotEmpty())
+
             var pairFrequencies = mutableMapOf<Pair<Char, Char>, Long>()
 
             for (i in 0 until template.length - 1) {
