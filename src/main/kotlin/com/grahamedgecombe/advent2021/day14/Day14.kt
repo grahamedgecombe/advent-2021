@@ -10,43 +10,34 @@ object Day14 : Puzzle<Day14.Input>(14) {
         val template: String,
         val rules: Map<Pair<Char, Char>, Char>
     ) {
-        private data class Key(val pair: Pair<Char, Char>, val last: Boolean)
-
         fun solve(steps: Int): Long {
-            var pairFrequencies = mutableMapOf<Key, Long>()
+            var pairFrequencies = mutableMapOf<Pair<Char, Char>, Long>()
 
             for (i in 0 until template.length - 1) {
                 val pair = Pair(template[i], template[i + 1])
-                val last = i == template.length - 2
-                increment(pairFrequencies, Key(pair, last), 1)
+                increment(pairFrequencies, pair, 1)
             }
 
-            for (step in 0 until steps) {
-                val next = mutableMapOf<Key, Long>()
+            // The last character never changes, so we add it in at the end.
 
-                for ((key, frequency) in pairFrequencies) {
-                    val pair = key.pair
+            for (step in 0 until steps) {
+                val next = mutableMapOf<Pair<Char, Char>, Long>()
+
+                for ((pair, frequency) in pairFrequencies) {
                     val insertion = rules[pair] ?: throw UnsolvableException()
 
-                    val key1 = Key(Pair(pair.first, insertion), false)
-                    val key2 = Key(Pair(insertion, pair.second), key.last)
-
-                    increment(next, key1, frequency)
-                    increment(next, key2, frequency)
+                    increment(next, Pair(pair.first, insertion), frequency)
+                    increment(next, Pair(insertion, pair.second), frequency)
                 }
 
                 pairFrequencies = next
             }
 
             val charFrequencies = mutableMapOf<Char, Long>()
-
-            for ((key, frequency) in pairFrequencies) {
-                increment(charFrequencies, key.pair.first, frequency)
-
-                if (key.last) {
-                    increment(charFrequencies, key.pair.second, frequency)
-                }
+            for ((pair, frequency) in pairFrequencies) {
+                increment(charFrequencies, pair.first, frequency)
             }
+            increment(charFrequencies, template.last(), 1)
 
             val min = charFrequencies.values.minOrNull() ?: throw UnsolvableException()
             val max = charFrequencies.values.maxOrNull() ?: throw UnsolvableException()
