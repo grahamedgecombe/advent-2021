@@ -10,47 +10,56 @@ object Day14 : Puzzle<Day14.Input>(14) {
         val template: String,
         val rules: Map<Pair<Char, Char>, Char>
     ) {
-        fun solve(): Int {
-            val frequencies = mutableMapOf<Char, Int>()
+        private data class Key(val pair: Pair<Char, Char>, val last: Boolean)
+
+        fun solve(steps: Int): Long {
+            var pairFrequencies = mutableMapOf<Key, Long>()
 
             for (i in 0 until template.length - 1) {
                 val pair = Pair(template[i], template[i + 1])
                 val last = i == template.length - 2
-                countFrequencies(frequencies, 10, pair, last)
+                increment(pairFrequencies, Key(pair, last), 1)
             }
 
-            val min = frequencies.values.minOrNull() ?: throw UnsolvableException()
-            val max = frequencies.values.maxOrNull() ?: throw UnsolvableException()
+            for (step in 0 until steps) {
+                val next = mutableMapOf<Key, Long>()
+
+                for ((key, frequency) in pairFrequencies) {
+                    val pair = key.pair
+                    val insertion = rules[pair] ?: throw UnsolvableException()
+
+                    val key1 = Key(Pair(pair.first, insertion), false)
+                    val key2 = Key(Pair(insertion, pair.second), key.last)
+
+                    increment(next, key1, frequency)
+                    increment(next, key2, frequency)
+                }
+
+                pairFrequencies = next
+            }
+
+            val charFrequencies = mutableMapOf<Char, Long>()
+
+            for ((key, frequency) in pairFrequencies) {
+                increment(charFrequencies, key.pair.first, frequency)
+
+                if (key.last) {
+                    increment(charFrequencies, key.pair.second, frequency)
+                }
+            }
+
+            val min = charFrequencies.values.minOrNull() ?: throw UnsolvableException()
+            val max = charFrequencies.values.maxOrNull() ?: throw UnsolvableException()
             return max - min
         }
 
-        private fun increment(
-            frequencies: MutableMap<Char, Int>,
-            key: Char
+        private fun <T> increment(
+            frequencies: MutableMap<T, Long>,
+            key: T,
+            increment: Long
         ) {
             val value = frequencies.getOrDefault(key, 0)
-            frequencies[key] = value + 1
-        }
-
-        private fun countFrequencies(
-            frequencies: MutableMap<Char, Int>,
-            steps: Int,
-            pair: Pair<Char, Char>,
-            last: Boolean
-        ) {
-            if (steps == 0) {
-                increment(frequencies, pair.first)
-
-                if (last) {
-                    increment(frequencies, pair.second)
-                }
-
-                return
-            }
-
-            val inserted = rules[pair] ?: throw UnsolvableException()
-            countFrequencies(frequencies, steps - 1, Pair(pair.first, inserted), false)
-            countFrequencies(frequencies, steps - 1, Pair(inserted, pair.second), last)
+            frequencies[key] = value + increment
         }
     }
 
@@ -77,7 +86,11 @@ object Day14 : Puzzle<Day14.Input>(14) {
         return Input(template, rules)
     }
 
-    override fun solvePart1(input: Input): Int {
-        return input.solve()
+    override fun solvePart1(input: Input): Long {
+        return input.solve(10)
+    }
+
+    override fun solvePart2(input: Input): Long {
+        return input.solve(40)
     }
 }
