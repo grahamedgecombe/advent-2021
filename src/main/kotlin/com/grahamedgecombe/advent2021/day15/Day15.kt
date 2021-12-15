@@ -28,6 +28,36 @@ object Day15 : Puzzle<Day15.Grid>(15) {
                 .sumOf { node -> get(node.x, node.y) }
         }
 
+        fun expand(): Grid {
+            val newWidth = width * 5
+            val newHeight = height * 5
+            val newRisks = IntArray(newWidth * newHeight)
+
+            var srcIndex = 0
+            for (srcY in 0 until height) {
+                for (srcX in 0 until width) {
+                    val risk = risks[srcIndex++]
+
+                    for (dy in 0 until 5) {
+                        for (dx in 0 until 5) {
+                            var newRisk = risk + dx + dy
+                            if (newRisk > 9) {
+                                newRisk -= 9
+                            }
+
+                            val destY = srcY + dy * height
+                            val destX = srcX + dx * height
+
+                            val destIndex = destY * newWidth + destX
+                            newRisks[destIndex] = newRisk
+                        }
+                    }
+                }
+            }
+
+            return Grid(newWidth, newHeight, newRisks)
+        }
+
         companion object {
             fun parse(input: List<String>): Grid {
                 require(input.isNotEmpty())
@@ -90,5 +120,9 @@ object Day15 : Puzzle<Day15.Grid>(15) {
 
     override fun solvePart1(input: Grid): Int {
         return input.getLowestRiskPath()
+    }
+
+    override fun solvePart2(input: Grid): Int {
+        return input.expand().getLowestRiskPath()
     }
 }
