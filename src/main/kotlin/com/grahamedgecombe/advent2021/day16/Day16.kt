@@ -18,6 +18,25 @@ object Day16 : Puzzle<Day16.Packet>(16) {
             return sum
         }
 
+        fun evaluate(): Long {
+            return when (this) {
+                is Literal -> value
+                is Operator -> {
+                    val values = children.map(Packet::evaluate)
+                    when (type) {
+                        0 -> values.reduce(Long::plus)
+                        1 -> values.reduce(Long::times)
+                        2 -> values.minOrNull() ?: throw IllegalArgumentException()
+                        3 -> values.maxOrNull() ?: throw IllegalArgumentException()
+                        5 -> if (values[0] > values[1]) 1 else 0
+                        6 -> if (values[0] < values[1]) 1 else 0
+                        7 -> if (values[0] == values[1]) 1 else 0
+                        else -> throw AssertionError()
+                    }
+                }
+            }
+        }
+
         companion object {
             fun parse(reader: BitReader): Packet {
                 val version = reader.readBits(3)
@@ -108,5 +127,9 @@ object Day16 : Puzzle<Day16.Packet>(16) {
 
     override fun solvePart1(input: Packet): Int {
         return input.sumVersions()
+    }
+
+    override fun solvePart2(input: Packet): Long {
+        return input.evaluate()
     }
 }
