@@ -72,4 +72,18 @@ object Day17 : Puzzle<Day17.TargetArea>(17) {
 
         return maxY
     }
+
+    override fun solvePart2(input: TargetArea): Int {
+        var count = 0
+
+        for (x in 0..input.to.x) {
+            for (y in input.from.y..-input.from.y) {
+                if (calculateMaxY(x, y, input) != Int.MIN_VALUE) {
+                    count++
+                }
+            }
+        }
+
+        return count
+    }
 }
