@@ -3,6 +3,7 @@ package com.grahamedgecombe.advent2021.day18
 import com.grahamedgecombe.advent2021.Puzzle
 import java.io.Reader
 import java.io.StringReader
+import kotlin.math.max
 
 object Day18 : Puzzle<List<Day18.Cell>>(18) {
     data class ExplodeResult(val cell: Cell, val leftResidual: Int, val rightResidual: Int)
@@ -177,5 +178,21 @@ object Day18 : Puzzle<List<Day18.Cell>>(18) {
 
     override fun solvePart1(input: List<Cell>): Int {
         return sumOf(input).getMagnitude()
+    }
+
+    override fun solvePart2(input: List<Cell>): Int {
+        var magnitude = Int.MIN_VALUE
+
+        for (a in input) {
+            for (b in input) {
+                if (a == b) {
+                    continue
+                }
+
+                magnitude = max(magnitude, a.plus(b).getMagnitude())
+            }
+        }
+
+        return magnitude
     }
 }
