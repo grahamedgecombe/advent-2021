@@ -76,7 +76,7 @@ object Day19 : Puzzle<List<Set<Vector3>>>(19) {
         return null
     }
 
-    override fun solvePart1(input: List<Set<Vector3>>): Int {
+    private fun solve(input: List<Set<Vector3>>): Pair<Set<Vector3>, List<Vector3>> {
         val remaining = input.map(::rotate).toMutableList()
 
         val beacons = remaining.first().first().toMutableSet()
@@ -102,6 +102,24 @@ object Day19 : Puzzle<List<Set<Vector3>>>(19) {
             throw UnsolvableException()
         }
 
-        return beacons.size
+        return Pair(beacons, positions)
+    }
+
+    override fun solvePart1(input: List<Set<Vector3>>): Int {
+        return solve(input).first.size
+    }
+
+    override fun solvePart2(input: List<Set<Vector3>>): Int {
+        val positions = solve(input).second
+        var maxDistance = Int.MIN_VALUE
+
+        for ((i, a) in positions.withIndex()) {
+            for (j in 0 until i) {
+                val distance = a.getManhattanDistance(positions[j])
+                maxDistance = max(maxDistance, distance)
+            }
+        }
+
+        return maxDistance
     }
 }
