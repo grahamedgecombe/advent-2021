@@ -111,4 +111,12 @@ object Day20 : Puzzle<Day20.Input>(20) {
             .next(input.enhancements)
             .countPixels()
     }
+
+    override fun solvePart2(input: Input): Int {
+        var image = input.image
+        for (x in 0 until 50) {
+            image = image.next(input.enhancements)
+        }
+        return image.countPixels()
+    }
 }
