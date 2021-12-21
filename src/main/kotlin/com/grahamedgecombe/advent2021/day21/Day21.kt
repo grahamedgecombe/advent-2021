@@ -1,6 +1,7 @@
 package com.grahamedgecombe.advent2021.day21
 
 import com.grahamedgecombe.advent2021.Puzzle
+import kotlin.math.max
 
 object Day21 : Puzzle<Pair<Day21.Player, Day21.Player>>(21) {
     private fun parsePosition(s: String): Int {
@@ -60,5 +61,48 @@ object Day21 : Puzzle<Pair<Day21.Player, Day21.Player>>(21) {
                 return player1.score * die.rolls
             }
         }
+    }
+
+    data class State(val player1: Player, val player2: Player)
+
+    private val DIRAC_ROLLS = buildList {
+        for (roll1 in 1..3) {
+            for (roll2 in 1..3) {
+                for (roll3 in 1..3) {
+                    add(roll1 + roll2 + roll3)
+                }
+            }
+        }
+    }
+
+    private fun countWins(state: State, cache: MutableMap<State, Pair<Long, Long>>): Pair<Long, Long> {
+        var pair = cache[state]
+        if (pair != null) {
+            return pair
+        }
+
+        var wins1 = 0L
+        var wins2 = 0L
+
+        for (roll in DIRAC_ROLLS) {
+            val player1 = state.player1.move(roll)
+
+            if (player1.score >= 21) {
+                wins1++
+            } else {
+                pair = countWins(State(state.player2, player1), cache)
+                wins1 += pair.second
+                wins2 += pair.first
+            }
+        }
+
+        pair = Pair(wins1, wins2)
+        cache[state] = pair
+        return pair
+    }
+
+    override fun solvePart2(input: Pair<Player, Player>): Long {
+        val wins = countWins(State(input.first, input.second), mutableMapOf())
+        return max(wins.first, wins.second)
     }
 }
