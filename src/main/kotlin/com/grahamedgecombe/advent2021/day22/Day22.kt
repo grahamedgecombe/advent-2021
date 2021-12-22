@@ -135,4 +135,8 @@ object Day22 : Puzzle<List<Day22.Step>>(22) {
         val steps = input.filter { step -> step.cube.isInPart1Region() }
         return solve(steps)
     }
+
+    override fun solvePart2(input: List<Step>): Long {
+        return solve(input)
+    }
 }
