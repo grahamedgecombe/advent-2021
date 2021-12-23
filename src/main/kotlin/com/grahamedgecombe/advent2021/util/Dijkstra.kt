@@ -5,11 +5,13 @@ import java.util.PriorityQueue
 object Dijkstra {
     interface Node<T : Node<T>> {
         val isGoal: Boolean
-        val neighbours: Sequence<T>
-        fun getDistance(neighbour: T): Int
+        val neighbours: Sequence<Neighbour<T>>
     }
 
-    fun <T : Node<T>> search(root: T): Sequence<List<T>> {
+    data class Neighbour<T : Node<T>>(val node: T, val length: Int)
+    data class Path<T : Node<T>>(val nodes: List<T>, val distance: Int)
+
+    fun <T : Node<T>> search(root: T): Sequence<Path<T>> {
         val distance = mutableMapOf<T, Int>()
         val queue = PriorityQueue(compareBy(distance::get))
         val parents = mutableMapOf<T, T>()
@@ -30,11 +32,11 @@ object Dijkstra {
                     }
 
                     path.reverse()
-                    yield(path)
+                    yield(Path(path, distance[current]!!))
                 }
 
-                for (neighbour in current.neighbours) {
-                    val alt = distance[current]!! + current.getDistance(neighbour)
+                for ((neighbour, length) in current.neighbours) {
+                    val alt = distance[current]!! + length
                     if (alt < distance.getOrDefault(neighbour, Int.MAX_VALUE)) {
                         distance[neighbour] = alt
 

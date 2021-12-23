@@ -23,9 +23,7 @@ object Day15 : Puzzle<Day15.Grid>(15) {
             val path = Dijkstra.search(Node(this, 0, 0))
                 .firstOrNull() ?: throw UnsolvableException()
 
-            return path.asSequence()
-                .drop(1)
-                .sumOf { node -> get(node.x, node.y) }
+            return path.distance
         }
 
         fun expand(): Grid {
@@ -86,7 +84,7 @@ object Day15 : Puzzle<Day15.Grid>(15) {
         override val isGoal: Boolean
             get() = x == (grid.width - 1) && y == (grid.height - 1)
 
-        override val neighbours: Sequence<Node>
+        override val neighbours: Sequence<Dijkstra.Neighbour<Node>>
             get() = sequence {
                 for (dy in -1..1) {
                     val y0 = y + dy
@@ -104,14 +102,10 @@ object Day15 : Puzzle<Day15.Grid>(15) {
                             continue
                         }
 
-                        yield(Node(grid, x0, y0))
+                        yield(Dijkstra.Neighbour(Node(grid, x0, y0), grid.get(x0, y0)))
                     }
                 }
             }
-
-        override fun getDistance(neighbour: Node): Int {
-            return grid.get(neighbour.x, neighbour.y)
-        }
     }
 
     override fun parse(input: Sequence<String>): Grid {

@@ -6,17 +6,19 @@ import kotlin.math.min
 object AStar {
     interface Node<T : Node<T>> {
         val isGoal: Boolean
-        val neighbours: Sequence<T>
+        val neighbours: Sequence<Neighbour<T>>
         val cost: Int
-        fun getDistance(neighbour: T): Int
     }
+
+    data class Neighbour<T : Node<T>>(val node: T, val length: Int)
+    data class Path<T : Node<T>>(val nodes: List<T>, val distance: Int)
 
     private fun saturatedAdd(a: Int, b: Int): Int {
         val sum = a.toLong() + b
         return min(sum, Int.MAX_VALUE.toLong()).toInt()
     }
 
-    fun <T : Node<T>> search(root: T): Sequence<List<T>> {
+    fun <T : Node<T>> search(root: T): Sequence<Path<T>> {
         val closed = mutableSetOf<T>()
         val open = mutableSetOf<T>()
         val parents = mutableMapOf<T, T>()
@@ -43,18 +45,18 @@ object AStar {
                     }
 
                     path.reverse()
-                    yield(path)
+                    yield(Path(path, gScore[current]!!))
                 }
 
                 open -= current
                 closed += current
 
-                for (neighbour in current.neighbours) {
+                for ((neighbour, length) in current.neighbours) {
                     if (neighbour in closed) {
                         continue
                     }
 
-                    val tentativeGScore = saturatedAdd(gScore.getOrDefault(current, Int.MAX_VALUE), current.getDistance(neighbour))
+                    val tentativeGScore = saturatedAdd(gScore.getOrDefault(current, Int.MAX_VALUE), length)
                     if (neighbour !in open) {
                         open += neighbour
                     } else if (tentativeGScore >= gScore.getOrDefault(neighbour, Int.MAX_VALUE)) {
