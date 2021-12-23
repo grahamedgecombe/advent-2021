@@ -7,7 +7,6 @@ import kotlin.math.abs
 
 object Day23 : Puzzle<Day23.Node>(23) {
     private const val HALLWAY_LENGTH = 11
-    private const val ROOM_CAPACITY = 2
 
     private val ENERGY = mutableMapOf(
         'A' to 1,
@@ -16,7 +15,15 @@ object Day23 : Puzzle<Day23.Node>(23) {
         'D' to 1000,
     )
 
+    private val EXTRA_AMPHIPODS = arrayOf(
+        charArrayOf('D', 'D'),
+        charArrayOf('B', 'C'),
+        charArrayOf('A', 'B'),
+        charArrayOf('C', 'A'),
+    )
+
     data class Node(
+        val roomCapacity: Int,
         val hallway: CharArray,
         val rooms: Array<CharArray>,
     ) : Dijkstra.Node<Node> {
@@ -24,7 +31,7 @@ object Day23 : Puzzle<Day23.Node>(23) {
             get() = rooms.withIndex().all { (i, room) -> isRoomInGoalState(i, room) }
 
         private fun isRoomInGoalState(roomIndex: Int, room: CharArray): Boolean {
-            if (room.size != ROOM_CAPACITY) {
+            if (room.size != roomCapacity) {
                 return false
             }
 
@@ -61,11 +68,11 @@ object Day23 : Puzzle<Day23.Node>(23) {
         }
 
         private fun getCost(roomIndex: Int, roomSize: Int, hallwayIndex: Int): Int {
-            return abs((roomIndex * 2 + 2) - hallwayIndex) + (ROOM_CAPACITY - roomSize) + 1
+            return abs((roomIndex * 2 + 2) - hallwayIndex) + (roomCapacity - roomSize) + 1
         }
 
         private fun isRoomEnterable(amphipod: Char, room: CharArray): Boolean {
-            if (room.size >= ROOM_CAPACITY) {
+            if (room.size >= roomCapacity) {
                 return false
             }
 
@@ -102,7 +109,7 @@ object Day23 : Puzzle<Day23.Node>(23) {
                         newRooms[roomIndex] = newRoom
 
                         val cost = getCost(roomIndex, room.size, hallwayIndex) * ENERGY[amphipod]!!
-                        yield(Dijkstra.Neighbour(Node(newHallway, newRooms), cost))
+                        yield(Dijkstra.Neighbour(Node(roomCapacity, newHallway, newRooms), cost))
                     }
                 }
 
@@ -132,9 +139,30 @@ object Day23 : Puzzle<Day23.Node>(23) {
                     newRooms[roomIndex] = newRoom
 
                     val cost = getCost(roomIndex, newRoom.size, hallwayIndex) * ENERGY[amphipod]!!
-                    yield(Dijkstra.Neighbour(Node(newHallway, newRooms), cost))
+                    yield(Dijkstra.Neighbour(Node(roomCapacity, newHallway, newRooms), cost))
                 }
             }
+
+        fun unfold(): Node {
+            require(roomCapacity == 2)
+
+            val newRooms = Array(rooms.size) { i ->
+                val newRoom = CharArray(4)
+
+                newRoom[0] = rooms[i][0]
+                newRoom[1] = EXTRA_AMPHIPODS[i][0]
+                newRoom[2] = EXTRA_AMPHIPODS[i][1]
+                newRoom[3] = rooms[i][1]
+
+                newRoom
+            }
+
+            return Node(
+                roomCapacity = 4,
+                hallway,
+                newRooms
+            )
+        }
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -142,6 +170,7 @@ object Day23 : Puzzle<Day23.Node>(23) {
 
             other as Node
 
+            if (roomCapacity != other.roomCapacity) return false
             if (!hallway.contentEquals(other.hallway)) return false
             if (!rooms.contentDeepEquals(other.rooms)) return false
 
@@ -149,13 +178,14 @@ object Day23 : Puzzle<Day23.Node>(23) {
         }
 
         override fun hashCode(): Int {
-            var result = hallway.contentHashCode()
+            var result = roomCapacity
+            result = 31 * result + hallway.contentHashCode()
             result = 31 * result + rooms.contentDeepHashCode()
             return result
         }
 
         override fun toString(): String {
-            return "Node(hallway=${hallway.contentToString()}, rooms=${rooms.contentDeepToString()})"
+            return "Node(roomCapacity=$roomCapacity, hallway=${hallway.contentToString()}, rooms=${rooms.contentDeepToString()})"
         }
     }
 
@@ -163,6 +193,7 @@ object Day23 : Puzzle<Day23.Node>(23) {
         val grid = input.toList()
 
         return Node(
+            2,
             CharArray(HALLWAY_LENGTH) { ' ' },
             arrayOf(
                 charArrayOf(grid[3][3], grid[2][3]),
@@ -175,6 +206,11 @@ object Day23 : Puzzle<Day23.Node>(23) {
 
     override fun solvePart1(input: Node): Int {
         val path = Dijkstra.search(input).firstOrNull() ?: throw UnsolvableException()
+        return path.distance
+    }
+
+    override fun solvePart2(input: Node): Int {
+        val path = Dijkstra.search(input.unfold()).firstOrNull() ?: throw UnsolvableException()
         return path.distance
     }
 }
