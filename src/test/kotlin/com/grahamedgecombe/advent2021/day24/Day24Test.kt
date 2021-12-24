@@ -10,4 +10,9 @@ object Day24Test {
     fun testPart1() {
         assertEquals(98998519596997, Day24.solvePart1(PROD_INPUT))
     }
+
+    @Test
+    fun testPart2() {
+        assertEquals(31521119151421, Day24.solvePart2(PROD_INPUT))
+    }
 }

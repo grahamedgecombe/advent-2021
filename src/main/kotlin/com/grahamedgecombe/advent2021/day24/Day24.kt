@@ -174,12 +174,17 @@ object Day24 : Puzzle<Day24.Program>(24) {
         return Program.parse(input)
     }
 
-    private fun solve(vm: VirtualMachine, visited: MutableSet<VirtualMachine>, code: Long): Long? {
+    private fun solve(
+        vm: VirtualMachine,
+        digits: IntProgression,
+        visited: MutableSet<VirtualMachine>,
+        code: Long
+    ): Long? {
         if (!visited.add(vm)) {
             return null
         }
 
-        for (digit in 1..9) {
+        for (digit in digits) {
             val nextCode = code * 10 + digit
             val nextVm = vm.copy()
 
@@ -227,7 +232,7 @@ object Day24 : Puzzle<Day24.Program>(24) {
                     continue
                 }
 
-                val solution = solve(nextVm.copy(), visited, nextCode)
+                val solution = solve(nextVm.copy(), digits, visited, nextCode)
                 if (solution != null) {
                     return solution
                 }
@@ -242,7 +247,15 @@ object Day24 : Puzzle<Day24.Program>(24) {
         return null
     }
 
+    private fun solve(input: Program, digits: IntProgression): Long {
+        return solve(VirtualMachine(input), digits, mutableSetOf(), 0) ?: throw UnsolvableException()
+    }
+
     override fun solvePart1(input: Program): Long {
-        return solve(VirtualMachine(input), mutableSetOf(), 0) ?: throw UnsolvableException()
+        return solve(input, 9 downTo 1)
+    }
+
+    override fun solvePart2(input: Program): Long {
+        return solve(input, 1..9)
     }
 }
