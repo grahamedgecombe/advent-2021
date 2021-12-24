@@ -40,7 +40,11 @@ object Dijkstra {
                     if (alt < distance.getOrDefault(neighbour, Int.MAX_VALUE)) {
                         distance[neighbour] = alt
 
-                        queue -= neighbour
+                        /*
+                         * TODO(gpe): find an efficient way to remove an item
+                         * from a PriorityQueue to reduce the number of nodes
+                         * we have to visit.
+                         */
                         queue += neighbour
 
                         parents[neighbour] = current
